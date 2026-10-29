@@ -65,6 +65,9 @@ df['release_year'] = pd.to_numeric(
 
 df = df.drop_duplicates(subset='track_id', keep='first').copy()
 df['duration_min'] = df['duration_ms'] / 60000
+
+# On supprime tout les morceaux dont la durée est inférieure à 2 minutes ou supérieure à 4,5 minutes.
+df = df[(df['duration_min'] >= 2.0) & (df['duration_min'] <= 4.5)]
 df['playlist_genre'] = df['playlist_genre'].astype('category')
 
 cleaned_df = df.copy()  # <-- dataSet propre pour backup
