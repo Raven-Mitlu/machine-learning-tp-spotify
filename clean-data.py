@@ -74,3 +74,7 @@ for col, ax in zip(audio_cols, axes.flat):
     ax.set_title(f'Distribution de {col}')
 plt.tight_layout()
 plt.show()
+
+import os
+os.makedirs("data", exist_ok=True)
+df.to_csv("data/spotify_clean.csv", index=False)
