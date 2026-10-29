@@ -57,6 +57,12 @@ df['release_year'] = pd.to_numeric(
     errors='coerce'
 ).astype('Int64')
 
+# création d'une nouvelle colonne pour l'année de sortie du morceau
+df['release_year'] = pd.to_numeric(
+    df['track_album_release_date'].astype('string').str.extract(r'(\d{4})', expand=False),
+    errors='coerce'
+).astype('Int64')
+
 df = df.drop_duplicates(subset='track_id', keep='first').copy()
 df['duration_min'] = df['duration_ms'] / 60000
 df['playlist_genre'] = df['playlist_genre'].astype('category')
@@ -78,3 +84,50 @@ plt.show()
 import os
 os.makedirs("data", exist_ok=True)
 df.to_csv("data/spotify_clean.csv", index=False)
+
+
+
+# Analyse bivariée
+ig, axes = plt.subplots(1, 3, figsize=(16, 4))
+sns.histplot(data=df, x='track_popularity', bins=20, ax=axes[0])
+axes[0].set_title('Popularité')
+sns.histplot(data=df, x='duration_min', bins=30, ax=axes[1])
+axes[1].set_title('Durée (minutes)')
+sns.countplot(data=df, x='playlist_genre', order=df['playlist_genre'].value_counts().index, ax=axes[2])
+axes[2].tick_params(axis='x', rotation=45)
+axes[2].set_title('Nombre de morceaux par genre')
+plt.tight_layout()
+plt.show()
+
+corr = df[audio_cols].corr(numeric_only=True)
+plt.figure(figsize=(10, 7))
+sns.heatmap(corr, annot=True, cmap='coolwarm', center=0, fmt='.2f')
+plt.title('Corrélations entre caractéristiques audio')
+plt.show()
+print('Corrélations avec energy :')
+print(corr['energy'].drop('energy').sort_values(key=abs, ascending=False).to_frame('correlation'))
+
+fig, axes = plt.subplots(3, 3, figsize=(16, 12))
+for col, ax in zip(audio_cols, axes.flat):
+    sns.boxplot(data=df, x='playlist_genre', y=col, ax=ax)
+    ax.tick_params(axis='x', rotation=45)
+plt.tight_layout()
+plt.show()
+
+print(df.groupby('playlist_genre', observed=True)['track_popularity'].mean().sort_values(ascending=False).to_frame('popularite_moyenne'))
+popularite_annee = df.dropna(subset=['release_year']).groupby('release_year', observed=True)['track_popularity'].mean()
+popularite_annee = popularite_annee.loc[(popularite_annee.index >= 1990) & (popularite_annee.index <= 2020)]
+popularite_annee.plot(figsize=(10, 4), marker='.')
+plt.title('Popularité moyenne selon l’année de sortie')
+plt.ylabel('Popularité moyenne')
+plt.show()
+
+plt.figure(figsize=(9, 6))
+sns.scatterplot(data=df, x='loudness', y='energy', hue='playlist_genre', alpha=0.35, s=15)
+plt.title('Énergie selon le volume sonore')
+plt.show()
+
+print('Top 10 artistes :')
+print(df['track_artist'].value_counts().head(10).to_frame('nombre_morceaux'))
+print('Top 10 morceaux les plus populaires :')
+print(df.nlargest(10, 'track_popularity')[['track_name', 'track_artist', 'track_popularity', 'playlist_genre']])
