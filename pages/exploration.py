@@ -56,11 +56,7 @@ for col, ax in zip(AUDIO_COLS, axes.flat):
     ax.set_title(f"Distribution de {col}")
 plt.tight_layout()
 st.pyplot(fig)
-st.markdown(
-    "**Commentaire :** décris ici ce que tu observes : quelles variables sont "
-    "symétriques, lesquelles sont très asymétriques (ex. `instrumentalness`, "
-    "`speechiness`), et ce que ça implique pour la suite."
-)
+
 
 # =========================================================
 # 2. Répartition des genres
@@ -72,7 +68,6 @@ sns.countplot(data=filtered, x="playlist_genre", order=ordre, ax=ax)
 ax.set_xlabel("Genre")
 ax.set_ylabel("Nombre de titres")
 st.pyplot(fig)
-st.markdown("**Commentaire :** les genres sont-ils équilibrés ? Lequel domine ?")
 
 # =========================================================
 # 3. Popularité selon le genre
@@ -83,7 +78,6 @@ sns.boxplot(data=filtered, x="playlist_genre", y="track_popularity", ax=ax)
 ax.set_xlabel("Genre")
 ax.set_ylabel("Popularité")
 st.pyplot(fig)
-st.markdown("**Commentaire :** quel genre est le plus populaire en médiane ? Où sont les écarts ?")
 
 # =========================================================
 # 4. Relation entre deux caractéristiques (choix interactif)
@@ -98,7 +92,6 @@ sns.scatterplot(data=echantillon, x=x_var, y=y_var, hue="playlist_genre",
                 alpha=0.5, s=18, ax=ax)
 st.pyplot(fig)
 st.caption("Échantillon de 3 000 titres maximum pour garder un affichage fluide.")
-st.markdown("**Commentaire :** y a-t-il une relation visible entre ces deux variables ? Des groupes par genre ?")
 
 # =========================================================
 # 5. Matrice de corrélation
@@ -109,10 +102,7 @@ fig, ax = plt.subplots(figsize=(10, 7))
 sns.heatmap(filtered[cols_corr].corr(), annot=True, fmt=".2f",
             cmap="coolwarm", center=0, ax=ax)
 st.pyplot(fig)
-st.markdown(
-    "**Commentaire :** quelles variables sont fortement corrélées "
-    "(ex. `energy` et `loudness`) ? Laquelle est la plus liée à la popularité ?"
-)
+
 
 # =========================================================
 # 6. Profil moyen par genre (choix interactif)
@@ -126,4 +116,3 @@ sns.barplot(x=moyennes.index, y=moyennes.values, ax=ax)
 ax.set_xlabel("Genre")
 ax.set_ylabel(f"Moyenne de {var}")
 st.pyplot(fig)
-st.markdown("**Commentaire :** quels genres se distinguent sur cette caractéristique ?")

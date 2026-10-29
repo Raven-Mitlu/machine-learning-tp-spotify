@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+meilleur_modele_spotify.joblib
+modele_regression_energie.joblib
