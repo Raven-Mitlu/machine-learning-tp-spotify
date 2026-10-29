@@ -7,11 +7,19 @@ import joblib
 # ==========================================
 # 1. CHARGEMENT DES DONNeES ET MODELES (CACHE)
 # ==========================================
-@st.cache_data
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+
+from utils import charger_modele
+
+
 @st.cache_data
 def load_data():
     df = pd.read_csv("./data/spotify_clean.csv")
 
+    # recrée release_year si le CSV ne la contient pas
     if "release_year" not in df.columns:
         df["release_year"] = pd.to_numeric(
             df["track_album_release_date"].astype(str).str[:4], errors="coerce"
@@ -23,9 +31,6 @@ def load_data():
                            + " (Realite : " + df["playlist_genre"].str.upper() + ")")
     return df.drop_duplicates(subset=["titre_complet"])
 
-@st.cache_resource
-from utils import charger_modele
-
 
 @st.cache_resource
 def load_models():
@@ -33,6 +38,10 @@ def load_models():
     modele_clf = charger_modele("meilleur_modele_spotify.joblib")
     modele_lineaire = charger_modele("modele_lineaire_energie.joblib")
     return modele_reg, modele_clf, modele_lineaire
+
+
+modele_reg, modele_clf, modele_lineaire = load_models()
+df_spotify = load_data()
 
 modele_reg, modele_clf, modele_lineaire = load_models()
 df_spotify = load_data()
