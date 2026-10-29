@@ -51,6 +51,12 @@ print('Morceaux uniques :', df['track_id'].nunique())
 print('Lignes dupliquées par track_id :', int(df['track_id'].duplicated().sum()))
 print('Morceaux associés à plusieurs genres :', int((genres_par_morceau > 1).sum()))
 
+# création d'une nouvelle colonne pour l'année de sortie du morceau
+df['release_year'] = pd.to_numeric(
+    df['track_album_release_date'].astype('string').str.extract(r'(\d{4})', expand=False),
+    errors='coerce'
+).astype('Int64')
+
 df = df.drop_duplicates(subset='track_id', keep='first').copy()
 df['duration_min'] = df['duration_ms'] / 60000
 df['playlist_genre'] = df['playlist_genre'].astype('category')
